@@ -1,0 +1,41 @@
+---
+title: "task3"
+output: pdf_document
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Task3** : H-index
+```{r task3,message=FALSE,warning=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(base)
+data <- read.csv("Final_Project_FlixGem.csv")
+
+HGindex <- function(Director_name) {
+  a <- data %>% filter(Director == Director_name)
+  for (i in 1:length(a)) {
+    if (i > nrow(a %>% select(Hidden.Gem.Score) %>% filter(Hidden.Gem.Score >= i))) {
+      return(i - 1)
+    }
+  }
+}
+Director_names <- unique(data$Director)
+newFunction <- function(list_of_names) {
+  ratings <- c()
+  for (i in 1:length(list_of_names)) {
+    ratings[i] <- (HGindex(list_of_names[i]))
+  }
+  return(ratings)
+}
+rankings <- newFunction(Director_names)
+rankings_vector <- c(rankings)
+Final <- tibble(Director_names, rankings_vector)
+Final <- as_tibble(Final)
+Final <- arrange(Final, desc(rankings_vector))
+HGH_index <- Final[1:10, ]
+colnames(HGH_index) <- c("Director", "HG-H index")
+HGH_index %>% kable() %>% kable_styling(bootstrap_options = c("striped", "hover"))
+```
